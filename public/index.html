@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>UriPlant - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 flex items-center justify-center h-screen text-white">
+    <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-96 border border-emerald-500/20">
+        <h1 class="text-3xl font-bold text-center text-emerald-500 mb-6">🌿 UriPlant</h1>
+        <form id="loginForm" class="space-y-4">
+            <input type="text" id="username" placeholder="Username" class="w-full p-3 bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" required>
+            <input type="password" id="password" placeholder="Password" class="w-full p-3 bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" required>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 py-3 rounded-lg font-bold transition">Masuk</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/v1/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                localStorage.setItem('apiKey', data.apiKey);
+                localStorage.setItem('username', data.username);
+                window.location.href = data.role === 'admin' ? '/admin.html' : '/client.html';
+            } else {
+                alert('Login Gagal!');
+            }
+        });
+    </script>
+</body>
+</html>

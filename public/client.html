@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>UriPlant Explorer</title>
+</head>
+<body class="bg-gray-900 text-emerald-50 font-sans">
+    <nav class="p-6 border-b border-emerald-900 flex justify-between bg-gray-900 sticky top-0 z-50">
+        <h1 class="text-2xl font-bold text-emerald-400">🌿 UriPlant</h1>
+        <div class="flex items-center gap-4">
+            <span id="userDisplay" class="text-sm text-gray-400"></span>
+            <button onclick="logout()" class="bg-red-900/50 px-4 py-1 rounded text-xs">Logout</button>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-8">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-extrabold mb-4">Plant Encyclopedia</h2>
+            <div class="flex max-w-md mx-auto bg-gray-800 rounded-full p-2 border border-emerald-500/30">
+                <input id="search" type="text" placeholder="Search plant..." class="bg-transparent flex-1 px-4 outline-none">
+                <button onclick="search()" class="bg-emerald-600 px-6 py-2 rounded-full hover:bg-emerald-500 transition">Search</button>
+            </div>
+        </div>
+
+        <div id="results" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+    </main>
+
+    <script>
+        const apiKey = localStorage.getItem('apiKey');
+        if(!apiKey) window.location.href = '/index.html';
+        document.getElementById('userDisplay').innerText = `Key: ${apiKey.substring(0,8)}...`;
+
+        async function search() {
+            const q = document.getElementById('search').value;
+            const res = await fetch(`/api/v1/plants/search?q=${q}`, {
+                headers: { 'x-api-key': apiKey }
+            });
+            const data = await res.json();
+            const container = document.getElementById('results');
+            container.innerHTML = data.map(p => `
+                <div class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 hover:border-emerald-500 transition shadow-xl">
+                    <img src="${p.img}" class="h-48 w-full object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-emerald-400">${p.name}</h3>
+                        <p class="text-gray-400 text-sm mt-2">💧 Water: ${p.water} | 🏠 ${p.type}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        function logout() { localStorage.clear(); window.location.href='/'; }
+    </script>
+</body>
+</html>
